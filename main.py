@@ -208,6 +208,59 @@ class MaxTokensExperiment(BaseExperiment):
                 "error": error,
             })
 
+# ========== ЭКСПЕРИМЕНТ 4: ИТОГОВАЯ КОНФИГУРАЦИЯ ==========
+class FinalConfigurationExperiment(BaseExperiment):
+    name = "final_config"
+    description = "Итоговая конфигурация для сценария 'Первичный анализ события ИБ'"
+
+    USER_PROMPT = (
+        "Событие: в 02:45 зафиксировано 40 неудачных попыток входа "
+        "в учётную запись 'root' с IP-адреса 192.168.1.105, "
+        "после чего в 02:47 произошёл успешный вход. "
+        "Проанализируй ситуацию."
+    )
+    SYSTEM_PROMPT = (
+        "Ты ассистент аналитика ИБ. Не выдумывай недостающие данные. "
+        "Явно отделяй факты от предположений. Ответ верни в формате: "
+        "Факты / Гипотезы / Действия."
+    )
+    TEMPERATURE = 0.3
+    MAX_TOKENS = 1000
+    REPEATS = 3
+
+    def run(self):
+        print(f"\n{'=' * 60}")
+        print(f"ЭКСПЕРИМЕНТ 4: {self.description}")
+        print(f"Параметры: temp={self.TEMPERATURE}, max_tokens={self.MAX_TOKENS}")
+        print(f"Повторов: {self.REPEATS}")
+        print('=' * 60)
+
+        for repeat in range(1, self.REPEATS + 1):
+            answer, latency, error = self.ask_model(
+                prompt=self.USER_PROMPT,
+                system=self.SYSTEM_PROMPT,
+                temperature=self.TEMPERATURE,
+                max_tokens=self.MAX_TOKENS,
+            )
+            if error:
+                print(f"  [{repeat}/{self.REPEATS}] ОШИБКА: {error}")
+            else:
+                print(f"  [{repeat}/{self.REPEATS}] OK ({latency:.2f} с), "
+                      f"длина: {len(answer)} симв.")
+
+            self.results.append({
+                "experiment": self.name,
+                "model": MODEL,
+                "system_id": "sys_final",
+                "system_text": self.SYSTEM_PROMPT,
+                "user_prompt": self.USER_PROMPT,
+                "temperature": self.TEMPERATURE,
+                "max_tokens": self.MAX_TOKENS,
+                "repeat": repeat,
+                "latency": round(latency, 3),
+                "answer": answer,
+                "error": error,
+            })
 
 # ========== СОХРАНЕНИЕ РЕЗУЛЬТАТОВ ==========
 def save_all_results(results, filename=RESULTS_FILE):
@@ -229,6 +282,7 @@ EXPERIMENTS = {
     "1": SystemPromptExperiment,
     "2": TemperatureExperiment,
     "3": MaxTokensExperiment,
+    "4": FinalConfigurationExperiment,
 }
 
 
