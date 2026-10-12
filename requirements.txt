@@ -1,16 +1,4 @@
-# Core dependencies
-requests>=2.31.0
-numpy>=1.24.0
-pandas>=2.0.0
-
-# LLM-related packages
-openai>=1.0.0
-transformers>=4.30.0
-torch>=2.0.0
-
-# Web framework (if needed)
-flask>=2.3.0
-
-# Utilities
-python-dotenv>=1.0.0
-tqdm>=4.65.0
+openai
+python-dotenv
+pandas
+openpyxl
